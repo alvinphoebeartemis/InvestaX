@@ -1,1 +1,1 @@
-# InvestaX
+# Album Backend Assignment

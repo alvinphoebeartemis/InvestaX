@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const serveIndex = require('serve-index');
+const cors = require('cors');
 
 // Router Files
 const indexRouter = require('./routes/index');
@@ -17,15 +18,20 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Other initialization
+app.use(cors())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Global Variables
+global.APP_PATH = __dirname;
+
 // Router
 app.use('/', indexRouter);
 app.use('/photos', photoRouter);
 app.use('/albums', express.static('albums'), serveIndex('albums', {'icons': true}))
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
