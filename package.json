@@ -23,6 +23,6 @@
     "standard": "^14.3.4"
   },
   "standard": {
-    "globals": [ "APP_PATH", "APP_PORT" , "fs", "md5", "async"]
+    "globals": [ "APP_PATH", "APP_PORT", "APP_VERSION", "fs", "md5", "async"]
   }
 }
