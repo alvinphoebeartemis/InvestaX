@@ -3,7 +3,6 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const serveIndex = require('serve-index');
 const cors = require('cors');
 
 // Router Files
@@ -26,12 +25,13 @@ app.use(cookieParser());
 
 // Global Variables
 global.APP_PATH = __dirname;
+global.md5 = require('md5');
+global.async = require('async');
+global.fs = require('fs');
 
 // Router
 app.use('/', indexRouter);
 app.use('/photos', photoRouter);
-app.use('/albums', express.static('albums'), serveIndex('albums', {'icons': true}))
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

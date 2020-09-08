@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 function helper () {
   // Helper to get files in a directory
   Object.defineProperty(this, 'getFiles', {
