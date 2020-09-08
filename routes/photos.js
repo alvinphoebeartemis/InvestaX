@@ -10,9 +10,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const formidable = require('formidable');
 const GlobalHelper = require('../helper/globalHelper');
-const UploadHelper = require('../helper/uploadHelper');
 
 /**
  * @API POST /photos/list
@@ -40,17 +38,17 @@ router.post('/list', (req, res) => {
     // Get directory
     for (let i = 0; i < dirList.length; i++) {
       const { name = '' } = dirList[i];
-      const fileDir = globalHelper.getFiles(`${path}/${name}`) || [];
+      const fileDir = globalHelper.getFiles(`${path}/${name.toLowerCase()}`) || [];
 
       // Get all files in the directory
       for (let j = 0; j < fileDir.length; j++) {
         const fileName = fileDir[j];
         fileList.push({
-          id: md5(fileName),
-          album: name,
+          id: md5(`${name}_${fileName}`),
+          album: globalHelper.capitalize(name),
           name: fileName,
-          path: `/albums/${name}/${fileName}`,
-          raw: `http://localhost:${APP_PORT}/photos/${name}/${fileName}`
+          path: `/albums/${name.toLowerCase()}/${fileName}`,
+          raw: `http://localhost:${APP_PORT}/photos/${name.toLowerCase()}/${fileName}`
         })
       }
     }
@@ -70,37 +68,30 @@ router.post('/list', (req, res) => {
  * @description Enables multiple file uploads.
  */
 router.put('/', (req, res) => {
-  const uploadHelper = new UploadHelper();
-  const form = formidable({ multiples: true });
-
-  const uploader = multer({
+  const uploadedFile = [];
+  const uploader =  multer({
     storage: multer.diskStorage({
       destination: (req, file, cb) => {
-        cb(null, `./albums`)
+        const { album = '' } = req.body;
+        cb(null, `./albums/${album.toLowerCase()}`)
       },
       filename: (req, file, cb) => {
-        console.log(file.originalname)
-        cb(null, file.originalname.replace(/ /g,"_"))
+        const { album = '' } = req.body;
+        const fileName = file.originalname.replace(/ /g,"_");
+
+        uploadedFile.push({
+          album,
+          name: fileName,
+          path: `/albums/${album.toLowerCase()}/${fileName}`,
+          raw: `http://localhost:${APP_PORT}/photos/${album.toLowerCase()}/${fileName}`
+        })
+
+        cb(null, fileName)
       }
     })
-  }).fields([{ name: 'documents', maxCount: 10 }])
+  }).array('documents', 10)
 
-  async.auto({
-    // Prepare files
-    getFiles: (next) => {
-      form.parse(req, (err, fields, files) => next(err, { fields, files }));
-    },
-
-    // Start uploading your files
-    startUpload: ['getFiles', ({ getFiles = {}}, next) => {
-      const { album = '' } = getFiles.fields;
-      const { documents = [] } = getFiles.files;
-      console.log(`Start uploading ${documents.length} file(s) on '/album/${album}'`);
-
-      next()
-    }]
-
-  }, (error, data) => {
+  uploader(req, res, (error) => {
     if (error) {
       console.error(error);
       return res
@@ -110,7 +101,7 @@ router.put('/', (req, res) => {
 
     res.json({
       message: 'OK',
-      data: []
+      data: uploadedFile
     })
   })
 });
@@ -133,7 +124,7 @@ router.delete('/:album/:fileName', (req, res) => {
     return res.status(400).send({ message: 'Invalid Parameter: [fileName]'});
   }
 
-  fs.unlink(`${basePath}/${album}/${fileName}`, (error) => {
+  fs.unlink(`${basePath}/${album.toLowerCase()}/${fileName}`, (error) => {
     if (error) {
       console.error(error);
       return res
@@ -180,9 +171,9 @@ router.delete('/', (req, res) => {
   async.forEachOf(filesToDelete, (file, i, cb) => {
     const { album = '', fileName = '' } = file;
 
-    console.log(`Deleting Files: /albums/${album}/${fileName}...`)
+    console.log(`Deleting Files: /albums/${album.toLowerCase()}/${fileName}...`)
 
-    fs.unlink(`${basePath}/${album}/${fileName}`, cb)
+    fs.unlink(`${basePath}/${album.toLowerCase()}/${fileName}`, cb)
   }, (error) => {
     if (error) {
       console.error(error);
@@ -216,7 +207,7 @@ router.get('/:album/:fileName', (req, res) => {
     return res.status(400).send({ message: 'Invalid Parameter: [fileName]'});
   }
 
-  const stream = fs.createReadStream(`${basePath}/${album}/${fileName}`);
+  const stream = fs.createReadStream(`${basePath}/${album.toLowerCase()}/${fileName}`);
 
   stream.on('error', function(error) {
     res.status(404)

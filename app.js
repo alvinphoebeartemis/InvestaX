@@ -1,9 +1,15 @@
 const createError = require('http-errors');
 const express = require('express');
-const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
+
+// Global Variables
+global.APP_PATH = __dirname;
+global.md5 = require('md5');
+global.async = require('async');
+global.fs = require('fs');
+global.path = require('path');
 
 // Router Files
 const indexRouter = require('./routes/index');
@@ -22,12 +28,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
-// Global Variables
-global.APP_PATH = __dirname;
-global.md5 = require('md5');
-global.async = require('async');
-global.fs = require('fs');
 
 // Router
 app.use('/', indexRouter);

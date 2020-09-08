@@ -7,6 +7,8 @@ function helper () {
       for (let i = 0; i < files.length; i++) {
         const name = `${dir}/${files[i]}`;
 
+        // console.log(path.extname(files[i]))
+
         if (!fs.statSync(name).isDirectory()){
           files_.push(`${files[i]}`);
         }
@@ -22,6 +24,13 @@ function helper () {
     }
   });
 
+  // Capitalize first letter
+  Object.defineProperty(this, 'capitalize', {
+    value: (s = '') => {
+      if (typeof s !== 'string') return '';
+      return s.charAt(0).toUpperCase() + s.slice(1)
+    }
+  });
 }
 
 module.exports = helper;
