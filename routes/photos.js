@@ -43,12 +43,13 @@ router.post('/list', (req, res) => {
       // Get all files in the directory
       for (let j = 0; j < fileDir.length; j++) {
         const fileName = fileDir[j]
+        const album = globalHelper.capitalize(name)
         fileList.push({
           id: md5(`${name}_${fileName}`),
-          album: globalHelper.capitalize(name),
+          album,
           name: fileName,
-          path: `/albums/${name.toLowerCase()}/${fileName}`,
-          raw: `http://localhost:${APP_PORT}/photos/${name.toLowerCase()}/${fileName}`
+          path: `/albums/${album}/${fileName}`,
+          raw: `http://localhost:${APP_PORT}/photos/${album.toLowerCase()}/${fileName}`
         })
       }
     }
