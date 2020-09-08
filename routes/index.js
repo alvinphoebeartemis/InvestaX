@@ -1,8 +1,18 @@
-const express = require('express');
-const router = express.Router();
+/***************************************
+ .___            .___
+ |   | ____    __| _/____ ___  ___
+ |   |/    \  / __ |/ __ \\  \/  /
+ |   |   |  \/ /_/ \  ___/ >    <
+ |___|___|  /\____ |\___  >__/\_ \
+ \/      \/    \/      \/
+ Index related API
+ *****************************************/
 
-router.get('/health', function(req, res) {
-  res.json({ message: 'OK' });
-});
+const express = require('express')
+const router = express.Router()
 
-module.exports = router;
+router.get('/health', function (req, res) {
+  res.json({ message: 'OK' })
+})
+
+module.exports = router

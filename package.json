@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "housekeeping": "npx standard routes/*"
+    "housekeeping": "npx standard routes/* helper/*",
+    "housekeeping-fix": "npx standard routes/* helper/* --fix"
   },
   "dependencies": {
     "async": "^3.2.0",
@@ -20,5 +21,8 @@
   },
   "devDependencies": {
     "standard": "^14.3.4"
+  },
+  "standard": {
+    "globals": [ "APP_PATH", "APP_PORT" , "fs", "md5", "async"]
   }
 }
